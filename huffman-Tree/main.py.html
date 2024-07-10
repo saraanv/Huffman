@@ -1,0 +1,76 @@
+<html>
+<head>
+<title>main.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #6897bb;}
+.s3 { color: #6a8759;}
+.s4 { color: #808080;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+main.py</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">heapq</span>
+<span class="s0">from </span><span class="s1">collections </span><span class="s0">import </span><span class="s1">defaultdict</span>
+
+<span class="s0">def </span><span class="s1">build_huffman_tree(data):</span>
+    <span class="s1">freq = defaultdict(int)</span>
+    <span class="s0">for </span><span class="s1">char </span><span class="s0">in </span><span class="s1">data:</span>
+        <span class="s1">freq[char] += </span><span class="s2">1</span>
+
+    <span class="s1">heap = [[weight</span><span class="s0">, </span><span class="s1">[char</span><span class="s0">, </span><span class="s3">&quot;&quot;</span><span class="s1">]] </span><span class="s0">for </span><span class="s1">char</span><span class="s0">, </span><span class="s1">weight </span><span class="s0">in </span><span class="s1">freq.items()]</span>
+    <span class="s1">heapq.heapify(heap)</span>
+
+    <span class="s0">while </span><span class="s1">len(heap) &gt; </span><span class="s2">1</span><span class="s1">:</span>
+        <span class="s1">lo = heapq.heappop(heap)</span>
+        <span class="s1">hi = heapq.heappop(heap)</span>
+        <span class="s0">for </span><span class="s1">pair </span><span class="s0">in </span><span class="s1">lo[</span><span class="s2">1</span><span class="s1">:]:</span>
+            <span class="s1">pair[</span><span class="s2">1</span><span class="s1">] = </span><span class="s3">'0' </span><span class="s1">+ pair[</span><span class="s2">1</span><span class="s1">]</span>
+        <span class="s0">for </span><span class="s1">pair </span><span class="s0">in </span><span class="s1">hi[</span><span class="s2">1</span><span class="s1">:]:</span>
+            <span class="s1">pair[</span><span class="s2">1</span><span class="s1">] = </span><span class="s3">'1' </span><span class="s1">+ pair[</span><span class="s2">1</span><span class="s1">]</span>
+        <span class="s1">heapq.heappush(heap</span><span class="s0">, </span><span class="s1">[lo[</span><span class="s2">0</span><span class="s1">] + hi[</span><span class="s2">0</span><span class="s1">]] + lo[</span><span class="s2">1</span><span class="s1">:] + hi[</span><span class="s2">1</span><span class="s1">:])</span>
+
+    <span class="s0">return </span><span class="s1">sorted(heapq.heappop(heap)[</span><span class="s2">1</span><span class="s1">:]</span><span class="s0">, </span><span class="s1">key=</span><span class="s0">lambda </span><span class="s1">p: (len(p[-</span><span class="s2">1</span><span class="s1">])</span><span class="s0">,</span><span class="s1">))</span>
+
+<span class="s0">def </span><span class="s1">encode(data</span><span class="s0">, </span><span class="s1">huffman_tree):</span>
+    <span class="s1">encoded_data = </span><span class="s3">&quot;&quot;</span>
+    <span class="s1">code_map = {char: code </span><span class="s0">for </span><span class="s1">char</span><span class="s0">, </span><span class="s1">code </span><span class="s0">in </span><span class="s1">huffman_tree}</span>
+
+    <span class="s0">for </span><span class="s1">char </span><span class="s0">in </span><span class="s1">data:</span>
+        <span class="s1">encoded_data += code_map[char]</span>
+
+    <span class="s0">return </span><span class="s1">encoded_data</span>
+
+<span class="s0">def </span><span class="s1">decode(encoded_data</span><span class="s0">, </span><span class="s1">huffman_tree):</span>
+    <span class="s1">decode_map = {code: char </span><span class="s0">for </span><span class="s1">char</span><span class="s0">, </span><span class="s1">code </span><span class="s0">in </span><span class="s1">huffman_tree}</span>
+    <span class="s1">decoded_data = </span><span class="s3">&quot;&quot;</span>
+    <span class="s1">code = </span><span class="s3">&quot;&quot;</span>
+
+    <span class="s0">for </span><span class="s1">bit </span><span class="s0">in </span><span class="s1">encoded_data:</span>
+        <span class="s1">code += bit</span>
+        <span class="s0">if </span><span class="s1">code </span><span class="s0">in </span><span class="s1">decode_map:</span>
+            <span class="s1">decoded_data += decode_map[code]</span>
+            <span class="s1">code = </span><span class="s3">&quot;&quot;  </span><span class="s4"># Reset the code for the next character</span>
+
+    <span class="s0">return </span><span class="s1">decoded_data</span>
+
+<span class="s0">while True</span><span class="s1">:</span>
+    <span class="s1">data = input(</span><span class="s3">&quot;Enter the data to encode (Enter '0' to stop): &quot;</span><span class="s1">)</span>
+    <span class="s0">if </span><span class="s1">data == </span><span class="s3">'0'</span><span class="s1">:</span>
+        <span class="s0">break</span>
+
+    <span class="s1">huffman_tree = build_huffman_tree(data)</span>
+    <span class="s1">encoded_data = encode(data</span><span class="s0">, </span><span class="s1">huffman_tree)</span>
+    <span class="s1">print(</span><span class="s3">&quot;Encoded data:&quot;</span><span class="s0">, </span><span class="s1">encoded_data)</span>
+
+    <span class="s1">decoded_data = decode(encoded_data</span><span class="s0">, </span><span class="s1">huffman_tree)</span>
+    <span class="s1">print(</span><span class="s3">&quot;Decoded data:&quot;</span><span class="s0">, </span><span class="s1">decoded_data)</span>
+</pre>
+</body>
+</html>
